@@ -1,0 +1,132 @@
+specification {
+  element actor
+  element system
+  element component
+}
+
+model {
+  customer = actor 'User' {
+    description 'User of social network'
+    style {
+      shape person
+    }
+  }
+
+  saas = system 'Social Network' {
+    component ui 'Frontend' {
+      style {
+        icon tech:nodejs
+        shape browser
+      }
+    }
+  backend = component 'Backend Services' {
+      description '
+        Implements business logic
+        and exposes as REST API
+      '
+      style {
+        icon tech:go
+      }
+      component api-gateway 'API-Gateway' {
+        description 'API'
+      }
+
+      component user-service 'User Service' {
+        description 'Service with all users inforamtion'
+
+        component user-service-api 'User API' {
+
+        }
+      }
+
+      component user-db 'User Database' {
+          description 'Postgresql Database for users information'
+          style {
+            shape storage
+            icon tech:postgresql
+          }
+      }
+
+      component statistics-service 'Statistics Service' {
+          description 'Statistics of likes, comments, posts'
+
+          component statistics-api 'Statistics API' {
+
+          }
+      }
+
+      component statistics-db 'Statistics Database' {
+          description 'Cassandra Database with all users statistics'
+          style {
+              shape storage
+              icon tech:cassandra
+          }
+      }
+
+      component events-broker 'Kafka Events Broker' {
+          description 'Events with comments, likes, views'
+          style {
+              shape queue
+              icon tech:kafka
+          }
+      }
+
+      component posts-comments-serviec 'Posts & Comments Service' {
+          description 'Service with all about posts and comments'
+
+          component post-comments-api "Post & Comments Service API" {
+
+          }
+      }
+
+      component post-comments-db 'Post & Comments Postgresql Database' {
+          description 'With all users posts and comments'
+          style {
+             shape storage
+             icon tech:postgresql
+          }
+      }
+
+      component post-comments-images-db 'Minio storage' {
+          description 'Minio storage for images of posts & comments'
+          style {
+             shape storage
+          }
+      }
+
+      events-broker -> statistics-service 'Data with statistics'
+      api-gateway -> events-broker 'Liks, posts, views'
+      user-service-api -> user-db 'Gets users information'
+      api-gateway -> user-service-api 'HTTS (Auth and Registration)'
+      api-gateway -> statistics-api 'HTTPS'
+      statistics-api -> statistics-db 'Get users statistics'
+      api-gateway -> post-comments-api 'HTTPS'
+      post-comments-api -> post-comments-db 'Stores all information about posts & comments'
+      post-comments-api -> post-comments-images-db 'Stores images of posts and extra data'
+    }
+
+    ui -> api-gateway 'HTTPS'
+  }
+
+  customer -> ui 'opens in browser'
+}
+
+views {
+
+  view index {
+    title 'Landscape view'
+
+    include *
+  }
+
+  view saas of saas {
+    include *
+
+    style * {
+      opacity 25%
+    }
+    style customer {
+      color muted
+    }
+  }
+}
