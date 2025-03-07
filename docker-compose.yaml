@@ -1,0 +1,43 @@
+name: social-network
+
+networks:
+  social-network-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+
+services:
+  postgres:
+    image: postgres:14.8-alpine3.18
+    environment:
+      POSTGRES_DB: "social-network"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - social-network-net
+    ports:
+      - "5432:5432"
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - social-network-net
+
+  user-service:
+    build:
+      context: .
+      dockerfile: ./user-service/Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      - social-network-net
+    depends_on:
+      - postgres
