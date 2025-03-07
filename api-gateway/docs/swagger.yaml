@@ -1,0 +1,141 @@
+definitions:
+  social-network_api-gateway_internal_models.LoginModel:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  social-network_api-gateway_internal_models.RegisterModel:
+    properties:
+      email:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  social-network_api-gateway_internal_models.UserModel:
+    properties:
+      email:
+        example: ""
+        type: string
+      family_name:
+        example: ""
+        type: string
+      id:
+        default: 0
+        type: integer
+      login:
+        example: ""
+        type: string
+      name:
+        example: ""
+        type: string
+      password:
+        example: ""
+        type: string
+      phone:
+        example: ""
+        type: string
+      registered_at:
+        example: "2023-10-01T00:00:00Z"
+        type: string
+      updated_at:
+        example: "2023-10-01T00:00:00Z"
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  title: Swagger API-GATEWAY
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Войти в систему
+      parameters:
+      - description: Войти в систему
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/social-network_api-gateway_internal_models.LoginModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Войти
+      tags:
+      - Auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Зарегистрироваться в сервисе
+      parameters:
+      - description: Создать пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/social-network_api-gateway_internal_models.RegisterModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Регистрация
+      tags:
+      - Auth
+  /user-profile:
+    get:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Получить пользователя
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/social-network_api-gateway_internal_models.UserModel'
+      security:
+      - BearerAuth: []
+      summary: Получить пользователя
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Обновить данные о пользователе
+      parameters:
+      - description: Обновить пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/social-network_api-gateway_internal_models.UserModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - BearerAuth: []
+      summary: Обновить пользователя
+      tags:
+      - User
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
