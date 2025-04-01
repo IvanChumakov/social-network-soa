@@ -1,7 +1,7 @@
 package config
 
 type Config struct {
-	ServerAddr       string
+	ServAddr         string
 	PostgresDb       string
 	PostgresUser     string
 	PostgresPassword string
@@ -10,10 +10,10 @@ type Config struct {
 
 func NewConfig() *Config {
 	return &Config{
-		ServerAddr:       ":8081",
+		ServAddr:         ":50051",
 		PostgresUser:     "user",
 		PostgresPassword: "password",
 		PostgresPort:     5432,
-		PostgresDb:       "users-db",
+		PostgresDb:       "posts-db",
 	}
 }

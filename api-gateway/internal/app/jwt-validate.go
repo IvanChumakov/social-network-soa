@@ -7,11 +7,13 @@ import (
 	"os"
 	customErros "social-network/api-gateway/internal/errors"
 	"social-network/api-gateway/internal/logger"
+	"strconv"
 )
 
 type Claims struct {
 	Login string `json:"login"`
 	Name  string `json:"name"`
+	Id    int    `json:"user-id"`
 	jwt.RegisteredClaims
 }
 
@@ -38,6 +40,7 @@ func JWTTokenVerify(r *http.Request) error {
 
 	r.Header.Set("login", claims.Login)
 	r.Header.Set("name", claims.Name)
+	r.Header.Set("user_id", strconv.Itoa(claims.Id))
 
 	return nil
 }

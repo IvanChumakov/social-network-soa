@@ -65,8 +65,9 @@ func (us *UserService) UpdateUserProfile(login string, user *repository.User) er
 
 func createJWTToken(user *repository.User) (string, error) {
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"name":  user.Name,
-		"login": user.Login,
+		"name":    user.Name,
+		"login":   user.Login,
+		"user-id": user.Id,
 	})
 	token, err := claims.SignedString([]byte(os.Getenv("SECRET_KEY")))
 	if err != nil {

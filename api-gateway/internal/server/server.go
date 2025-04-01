@@ -24,6 +24,22 @@ func NewServer(cfg *config.Config, app *app.App) *http.Server {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
 	})
+	mux.HandleFunc("/post", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			app.CreatePost(w, r)
+		case http.MethodDelete:
+			app.DeletePost(w, r)
+		case http.MethodPut:
+			app.UpdatePost(w, r)
+		case http.MethodGet:
+			app.GetPosts(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
+	mux.Handle("/post/", http.HandlerFunc(app.GetPostById))
+
 	mux.Handle("/swagger/", httpSwagger.Handler(httpSwagger.URL("swagger/swagger/doc.json")))
 
 	return &http.Server{

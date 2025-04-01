@@ -5,6 +5,7 @@ import (
 	"go.uber.org/fx"
 	_ "social-network/api-gateway/docs"
 	"social-network/api-gateway/internal/app"
+	"social-network/api-gateway/internal/client"
 	"social-network/api-gateway/internal/config"
 	"social-network/api-gateway/internal/logger"
 	"social-network/api-gateway/internal/server"
@@ -21,6 +22,7 @@ func main() {
 	addOpts := fx.Options(
 		fx.Provide(
 			config.NewConfig,
+			client.NewGrpcConnection,
 			app.NewApp,
 			server.NewServer,
 		),
