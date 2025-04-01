@@ -5,22 +5,47 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
+  user-data:
+  posts-data:
 
 services:
-  postgres:
+  user-postgres:
     image: postgres:14.8-alpine3.18
     environment:
-      POSTGRES_DB: "social-network"
+      POSTGRES_DB: "users-db"
       POSTGRES_USER: "user"
       POSTGRES_PASSWORD: "password"
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - user-data:/var/lib/postgresql/data
     networks:
       - social-network-net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432"
+
+  posts-postgres:
+    image: postgres:14.8-alpine3.18
+    environment:
+      POSTGRES_DB: "posts-db"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - posts-data:/var/lib/postgresql/data
+    networks:
+      - social-network-net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5433:5432"
 
   api-gateway:
     build:
@@ -30,6 +55,8 @@ services:
       - "8080:8080"
     networks:
       - social-network-net
+    depends_on:
+      - posts-service
 
   user-service:
     build:
@@ -40,4 +67,17 @@ services:
     networks:
       - social-network-net
     depends_on:
-      - postgres
+      user-postgres:
+        condition: service_healthy
+
+  posts-service:
+    build:
+      context: .
+      dockerfile: ./posts-comments-service/Dockerfile
+    ports:
+      - "50051:50051"
+    networks:
+      - social-network-net
+    depends_on:
+      posts-postgres:
+        condition: service_healthy

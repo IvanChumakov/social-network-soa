@@ -1,0 +1,52 @@
+syntax = "proto3";
+option go_package = "./;posts";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+message Post {
+  string name = 1;
+  string description = 2;
+  google.protobuf.Timestamp created_ad = 3;
+  google.protobuf.Timestamp updated_at = 4;
+  bool is_private = 5;
+  repeated string tags = 6;
+  int32 id = 7;
+  int32 user_id = 8;
+}
+
+message PostEssential {
+  string name = 1;
+  string description = 2;
+  bool is_private = 3;
+  repeated string tags = 4;
+}
+
+message PostWithNoUser {
+  string name = 1;
+  string description = 2;
+  bool is_private = 3;
+  repeated string tags = 4;
+  int32 id = 5;
+}
+
+message PostId {
+  int32 post_id = 1;
+}
+
+message Pagination {
+  int32 page_size = 1;
+  int32 page_index = 2;
+}
+
+message AllPosts {
+  repeated Post posts = 1;
+}
+
+service PostsService {
+  rpc AddPost(PostEssential) returns (google.protobuf.Empty);
+  rpc DeletePost(PostId) returns (google.protobuf.Empty);
+  rpc GetPostById(PostId) returns (Post);
+  rpc UpdatePost(PostWithNoUser) returns (google.protobuf.Empty);
+  rpc GetAllPostsPaginated(Pagination) returns (AllPosts);
+}
