@@ -6,6 +6,7 @@ RUN go mod download
 
 COPY api-gateway/ ./api-gateway/
 COPY .env ./
+COPY protos/ ./protos/
 RUN go build -o gateway ./api-gateway/cmd/main.go
 
 CMD ["./gateway"]
