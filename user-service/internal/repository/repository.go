@@ -21,24 +21,26 @@ func NewUserRepository(db *bun.DB) *UserRepository {
 	}
 }
 
-func (ur *UserRepository) RegisterUser(user *User) error {
+func (ur *UserRepository) RegisterUser(user *User) (int, error) {
 	oldUser, _ := ur.GetUserByLogin(user.Login)
 	if oldUser != nil {
-		return &customErros.LoginAlreadyTakenError{}
+		return 0, &customErros.LoginAlreadyTakenError{}
 	}
 
 	user.UpdatedAt = time.Now()
 	user.RegisteredAt = time.Now()
 
-	_, err := ur.db.NewInsert().
+	var id int
+	err := ur.db.NewInsert().
 		Model(user).
-		Exec(context.Background())
+		Returning("id").
+		Scan(context.Background(), &id)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to insert user: %v", err))
-		return err
+		return 0, err
 	}
 
-	return nil
+	return id, nil
 }
 
 func (ur *UserRepository) LoginUser(user *User) error {

@@ -324,3 +324,148 @@ func (a *App) GetPosts(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewEncoder(w).Encode(posts)
 }
+
+func (a *App) LikeEvent(w http.ResponseWriter, r *http.Request) {
+	logger.Info("POST /like")
+	if r.Method != http.MethodPost {
+		logger.Error("POST /like: method not allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := JWTTokenVerify(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = fmt.Fprintf(w, err.Error())
+		return
+	}
+
+	userID := r.Header.Get("user_id")
+	postId := r.URL.Query().Get("id")
+	postIdCasted, _ := strconv.Atoi(postId)
+
+	like := pb.Like{
+		PostId: int32(postIdCasted),
+	}
+
+	md := metadata.Pairs("user_id", userID)
+	ctx := metadata.NewOutgoingContext(r.Context(), md)
+	_, err = a.grpcClient.LikeEvent(ctx, &like)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Like event failed: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *App) ViewEvent(w http.ResponseWriter, r *http.Request) {
+	logger.Info("POST /view")
+	if r.Method != http.MethodPost {
+		logger.Error("POST /view: method not allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := JWTTokenVerify(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = fmt.Fprintf(w, err.Error())
+		return
+	}
+
+	userID := r.Header.Get("user_id")
+	postId := r.URL.Query().Get("id")
+	postIdCasted, _ := strconv.Atoi(postId)
+
+	view := pb.View{
+		PostId: int32(postIdCasted),
+	}
+
+	md := metadata.Pairs("user_id", userID)
+	ctx := metadata.NewOutgoingContext(r.Context(), md)
+	_, err = a.grpcClient.ViewEvent(ctx, &view)
+	if err != nil {
+		logger.Error(fmt.Sprintf("View event failed: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *App) AddComment(w http.ResponseWriter, r *http.Request) {
+	logger.Info("POST /comment")
+	if r.Method != http.MethodPost {
+		logger.Error("POST /comment: method not allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := JWTTokenVerify(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = fmt.Fprintf(w, err.Error())
+		return
+	}
+
+	var comment pb.Comment
+	err = json.NewDecoder(r.Body).Decode(&comment)
+	if err != nil {
+		logger.Error(fmt.Sprintf("comment json decode failed: %v", err))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	userID := r.Header.Get("user_id")
+	md := metadata.Pairs("user_id", userID)
+	ctx := metadata.NewOutgoingContext(r.Context(), md)
+
+	_, err = a.grpcClient.AddComment(ctx, &comment)
+	if err != nil {
+		logger.Error(fmt.Sprintf("add comment failed: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *App) GetAllComments(w http.ResponseWriter, r *http.Request) {
+	logger.Info("GET /comments")
+	if r.Method != http.MethodGet {
+		logger.Error("GET /comments: method not allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := JWTTokenVerify(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = fmt.Fprintf(w, err.Error())
+		return
+	}
+
+	pageSize, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	index, err := strconv.Atoi(r.URL.Query().Get("offset"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	postId := r.URL.Query().Get("id")
+	md := metadata.Pairs("post_id", postId)
+	ctx := metadata.NewOutgoingContext(r.Context(), md)
+
+	comments, err := a.grpcClient.GetAllCommentsPaginated(ctx, &pb.Pagination{
+		PageSize:  int32(pageSize),
+		PageIndex: int32(index),
+	})
+	if err != nil {
+		logger.Error(fmt.Sprintf("Get all comments failed: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(comments)
+}

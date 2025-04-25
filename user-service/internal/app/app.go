@@ -8,17 +8,22 @@ import (
 	"net/http"
 	customError "social-network/user-service/internal/errors"
 	"social-network/user-service/internal/logger"
+	"social-network/user-service/internal/models"
 	"social-network/user-service/internal/repository"
-	"social-network/user-service/internal/service"
+	eventservice "social-network/user-service/internal/service/event-service"
+	"social-network/user-service/internal/service/user-service"
+	"time"
 )
 
 type App struct {
-	userService service.UserServiceInterface
+	userService user_service.UserServiceInterface
+	broker      *eventservice.KafkaEvents
 }
 
-func NewApp(userService service.UserServiceInterface) *App {
+func NewApp(userService user_service.UserServiceInterface, broker *eventservice.KafkaEvents) *App {
 	return &App{
 		userService: userService,
+		broker:      broker,
 	}
 }
 
@@ -34,7 +39,7 @@ func (app *App) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := app.userService.Register(&user)
+	token, id, err := app.userService.Register(&user)
 	if err != nil {
 		var alreadyExists *customError.LoginAlreadyTakenError
 		w.WriteHeader(http.StatusBadRequest)
@@ -44,6 +49,16 @@ func (app *App) Register(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	err = app.broker.SendEvent(models.RegistrationInfo{
+		UserID:     id,
+		Registered: time.Now(),
+		Login:      user.Login,
+	}, "registrations-topic")
+	if err != nil {
+		logger.Error(fmt.Sprintf("failed to send registration info: %s", err.Error()))
+	}
+
 	_ = json.NewEncoder(w).Encode(token)
 	w.WriteHeader(http.StatusOK)
 }

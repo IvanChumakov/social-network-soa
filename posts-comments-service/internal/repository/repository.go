@@ -112,3 +112,32 @@ func (pr *PostRepository) GetAllPosts(limit int32, offset int32, userId int32) (
 
 	return posts, nil
 }
+
+func (pr *PostRepository) AddComment(comment Comment) error {
+	_, err := pr.db.NewInsert().
+		Model(&comment).
+		Exec(context.Background())
+	if err != nil {
+		logger.Error(fmt.Sprintf("error adding comment: %v", err))
+		return err
+	}
+
+	return nil
+}
+
+func (pr *PostRepository) GetAllComments(limit int32, offset int32, postId int32) ([]Comment, error) {
+	var comments []Comment
+
+	err := pr.db.NewSelect().
+		Model(&comments).
+		Where("post_id = ?", postId).
+		Order("created_at DESC").
+		Limit(int(limit)).
+		Offset(int(offset)).
+		Scan(context.Background())
+	if err != nil {
+		logger.Error(fmt.Sprintf("error getting all comments: %v", err))
+	}
+
+	return comments, nil
+}

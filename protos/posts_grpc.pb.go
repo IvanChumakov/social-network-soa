@@ -20,11 +20,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PostsService_AddPost_FullMethodName              = "/PostsService/AddPost"
-	PostsService_DeletePost_FullMethodName           = "/PostsService/DeletePost"
-	PostsService_GetPostById_FullMethodName          = "/PostsService/GetPostById"
-	PostsService_UpdatePost_FullMethodName           = "/PostsService/UpdatePost"
-	PostsService_GetAllPostsPaginated_FullMethodName = "/PostsService/GetAllPostsPaginated"
+	PostsService_AddPost_FullMethodName                 = "/PostsService/AddPost"
+	PostsService_DeletePost_FullMethodName              = "/PostsService/DeletePost"
+	PostsService_GetPostById_FullMethodName             = "/PostsService/GetPostById"
+	PostsService_UpdatePost_FullMethodName              = "/PostsService/UpdatePost"
+	PostsService_GetAllPostsPaginated_FullMethodName    = "/PostsService/GetAllPostsPaginated"
+	PostsService_LikeEvent_FullMethodName               = "/PostsService/LikeEvent"
+	PostsService_AddComment_FullMethodName              = "/PostsService/AddComment"
+	PostsService_ViewEvent_FullMethodName               = "/PostsService/ViewEvent"
+	PostsService_GetAllCommentsPaginated_FullMethodName = "/PostsService/GetAllCommentsPaginated"
 )
 
 // PostsServiceClient is the client API for PostsService service.
@@ -36,6 +40,10 @@ type PostsServiceClient interface {
 	GetPostById(ctx context.Context, in *PostId, opts ...grpc.CallOption) (*Post, error)
 	UpdatePost(ctx context.Context, in *PostWithNoUser, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetAllPostsPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*AllPosts, error)
+	LikeEvent(ctx context.Context, in *Like, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AddComment(ctx context.Context, in *Comment, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ViewEvent(ctx context.Context, in *View, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetAllCommentsPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*AllComments, error)
 }
 
 type postsServiceClient struct {
@@ -96,6 +104,46 @@ func (c *postsServiceClient) GetAllPostsPaginated(ctx context.Context, in *Pagin
 	return out, nil
 }
 
+func (c *postsServiceClient) LikeEvent(ctx context.Context, in *Like, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PostsService_LikeEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postsServiceClient) AddComment(ctx context.Context, in *Comment, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PostsService_AddComment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postsServiceClient) ViewEvent(ctx context.Context, in *View, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PostsService_ViewEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postsServiceClient) GetAllCommentsPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*AllComments, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AllComments)
+	err := c.cc.Invoke(ctx, PostsService_GetAllCommentsPaginated_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PostsServiceServer is the server API for PostsService service.
 // All implementations must embed UnimplementedPostsServiceServer
 // for forward compatibility.
@@ -105,6 +153,10 @@ type PostsServiceServer interface {
 	GetPostById(context.Context, *PostId) (*Post, error)
 	UpdatePost(context.Context, *PostWithNoUser) (*emptypb.Empty, error)
 	GetAllPostsPaginated(context.Context, *Pagination) (*AllPosts, error)
+	LikeEvent(context.Context, *Like) (*emptypb.Empty, error)
+	AddComment(context.Context, *Comment) (*emptypb.Empty, error)
+	ViewEvent(context.Context, *View) (*emptypb.Empty, error)
+	GetAllCommentsPaginated(context.Context, *Pagination) (*AllComments, error)
 	mustEmbedUnimplementedPostsServiceServer()
 }
 
@@ -129,6 +181,18 @@ func (UnimplementedPostsServiceServer) UpdatePost(context.Context, *PostWithNoUs
 }
 func (UnimplementedPostsServiceServer) GetAllPostsPaginated(context.Context, *Pagination) (*AllPosts, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllPostsPaginated not implemented")
+}
+func (UnimplementedPostsServiceServer) LikeEvent(context.Context, *Like) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LikeEvent not implemented")
+}
+func (UnimplementedPostsServiceServer) AddComment(context.Context, *Comment) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddComment not implemented")
+}
+func (UnimplementedPostsServiceServer) ViewEvent(context.Context, *View) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ViewEvent not implemented")
+}
+func (UnimplementedPostsServiceServer) GetAllCommentsPaginated(context.Context, *Pagination) (*AllComments, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllCommentsPaginated not implemented")
 }
 func (UnimplementedPostsServiceServer) mustEmbedUnimplementedPostsServiceServer() {}
 func (UnimplementedPostsServiceServer) testEmbeddedByValue()                      {}
@@ -241,6 +305,78 @@ func _PostsService_GetAllPostsPaginated_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PostsService_LikeEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Like)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostsServiceServer).LikeEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostsService_LikeEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostsServiceServer).LikeEvent(ctx, req.(*Like))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PostsService_AddComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Comment)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostsServiceServer).AddComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostsService_AddComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostsServiceServer).AddComment(ctx, req.(*Comment))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PostsService_ViewEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(View)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostsServiceServer).ViewEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostsService_ViewEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostsServiceServer).ViewEvent(ctx, req.(*View))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PostsService_GetAllCommentsPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Pagination)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostsServiceServer).GetAllCommentsPaginated(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostsService_GetAllCommentsPaginated_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostsServiceServer).GetAllCommentsPaginated(ctx, req.(*Pagination))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PostsService_ServiceDesc is the grpc.ServiceDesc for PostsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -267,6 +403,22 @@ var PostsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllPostsPaginated",
 			Handler:    _PostsService_GetAllPostsPaginated_Handler,
+		},
+		{
+			MethodName: "LikeEvent",
+			Handler:    _PostsService_LikeEvent_Handler,
+		},
+		{
+			MethodName: "AddComment",
+			Handler:    _PostsService_AddComment_Handler,
+		},
+		{
+			MethodName: "ViewEvent",
+			Handler:    _PostsService_ViewEvent_Handler,
+		},
+		{
+			MethodName: "GetAllCommentsPaginated",
+			Handler:    _PostsService_GetAllCommentsPaginated_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

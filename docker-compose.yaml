@@ -7,6 +7,7 @@ networks:
 volumes:
   user-data:
   posts-data:
+  kafka_data:
 
 services:
   user-postgres:
@@ -57,6 +58,7 @@ services:
       - social-network-net
     depends_on:
       - posts-service
+      - user-service
 
   user-service:
     build:
@@ -68,6 +70,8 @@ services:
       - social-network-net
     depends_on:
       user-postgres:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
 
   posts-service:
@@ -81,3 +85,60 @@ services:
     depends_on:
       posts-postgres:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.1.2
+    container_name: zookeeper
+    networks:
+      - social-network-net
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_SERVERS: zookeeper:2888:3888
+
+  kafka:
+    image: confluentinc/cp-kafka:7.1.2
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - social-network-net
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - zookeeper
+
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:7.1.2
+    container_name: control-center
+    depends_on:
+      - zookeeper
+      - kafka
+    ports:
+      - "9021:9021"
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: DOCKER://host.docker.internal:29092
+      CONTROL_CENTER_ZOOKEEPER_CONNECT: zookeeper:2181
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+      CONTROL_CENTER_LOG4J_ROOT_LOGLEVEL: INFO
