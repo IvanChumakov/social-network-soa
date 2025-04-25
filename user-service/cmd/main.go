@@ -9,14 +9,16 @@ import (
 	"social-network/user-service/internal/logger"
 	"social-network/user-service/internal/repository"
 	"social-network/user-service/internal/server"
-	"social-network/user-service/internal/service"
+	eventservice "social-network/user-service/internal/service/event-service"
+	"social-network/user-service/internal/service/user-service"
 )
 
 func main() {
 	addOpts := fx.Options(
 		fx.Provide(
+			eventservice.NewKafkaEvents,
 			repository.NewUserRepository,
-			service.NewUserService,
+			user_service.NewUserService,
 			config.NewConfig,
 			app.NewApp,
 			server.NewServer,

@@ -1,19 +1,41 @@
 package config
 
 type Config struct {
-	ServerAddr       string
+	ServerConfig
+	PostgresConfig
+	KafkaConfig
+}
+
+type ServerConfig struct {
+	ServAddr string
+}
+
+type PostgresConfig struct {
 	PostgresDb       string
 	PostgresUser     string
 	PostgresPassword string
 	PostgresPort     int
 }
 
+type KafkaConfig struct {
+	KafkaUrl  string
+	KafkaPort string
+}
+
 func NewConfig() *Config {
 	return &Config{
-		ServerAddr:       ":8081",
-		PostgresUser:     "user",
-		PostgresPassword: "password",
-		PostgresPort:     5432,
-		PostgresDb:       "users-db",
+		ServerConfig: ServerConfig{
+			ServAddr: ":8081",
+		},
+		PostgresConfig: PostgresConfig{
+			PostgresUser:     "user",
+			PostgresPassword: "password",
+			PostgresPort:     5432,
+			PostgresDb:       "users-db",
+		},
+		KafkaConfig: KafkaConfig{
+			KafkaUrl:  "kafka",
+			KafkaPort: ":19092",
+		},
 	}
 }

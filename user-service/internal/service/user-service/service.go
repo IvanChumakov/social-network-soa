@@ -1,4 +1,4 @@
-package service
+package user_service
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 )
 
 type UserServiceInterface interface {
-	Register(user *repository.User) (string, error)
+	Register(user *repository.User) (string, int, error)
 	Login(user *repository.User) (string, error)
 	GetUserProfile(login string) (*repository.User, error)
 	UpdateUserProfile(login string, user *repository.User) error
@@ -26,17 +26,17 @@ func NewUserService(userRepository *repository.UserRepository) UserServiceInterf
 	}
 }
 
-func (us *UserService) Register(user *repository.User) (string, error) {
-	err := us.userRepository.RegisterUser(user)
+func (us *UserService) Register(user *repository.User) (string, int, error) {
+	id, err := us.userRepository.RegisterUser(user)
 	if err != nil {
-		return "", fmt.Errorf("failed to register user: %w", err)
+		return "", 0, fmt.Errorf("failed to register user: %w", err)
 	}
 
 	token, err := createJWTToken(user)
 	if err != nil {
-		return "", fmt.Errorf("failed to create JWT token: %w", err)
+		return "", 0, fmt.Errorf("failed to create JWT token: %w", err)
 	}
-	return token, nil
+	return token, id, nil
 }
 
 func (us *UserService) Login(user *repository.User) (string, error) {

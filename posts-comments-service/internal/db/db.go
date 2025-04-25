@@ -24,6 +24,15 @@ func InitDb(cfg *config.Config) *bun.DB {
 	db := bun.NewDB(sqldb, pgdialect.New())
 	_, err = db.NewCreateTable().
 		IfNotExists().
+		Model((*repository.Comment)(nil)).
+		Exec(context.Background())
+	if err != nil {
+		logger.Error(fmt.Sprintf("create comment table err: %s", err.Error()))
+		return nil
+	}
+
+	_, err = db.NewCreateTable().
+		IfNotExists().
 		Model((*repository.Post)(nil)).
 		Exec(context.Background())
 

@@ -39,6 +39,16 @@ func NewServer(cfg *config.Config, app *app.App) *http.Server {
 		}
 	})
 	mux.Handle("/post/", http.HandlerFunc(app.GetPostById))
+	mux.Handle("/like", http.HandlerFunc(app.LikeEvent))
+	mux.Handle("/view", http.HandlerFunc(app.ViewEvent))
+	mux.HandleFunc("/comments", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			app.GetAllComments(w, r)
+		case http.MethodPost:
+			app.AddComment(w, r)
+		}
+	})
 
 	mux.Handle("/swagger/", httpSwagger.Handler(httpSwagger.URL("swagger/swagger/doc.json")))
 

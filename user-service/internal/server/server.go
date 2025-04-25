@@ -25,7 +25,7 @@ func NewServer(cfg *config.Config, app *app.App) *http.Server {
 	})
 
 	return &http.Server{
-		Addr:    cfg.ServerAddr,
+		Addr:    cfg.ServAddr,
 		Handler: mux,
 	}
 }

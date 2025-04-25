@@ -1,4 +1,4 @@
-package service
+package posts_service
 
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -13,6 +13,8 @@ type Repository interface {
 	UpdatePost(post repository.Post) error
 	GetPostById(id int32) (repository.Post, error)
 	GetAllPosts(limit int32, offset int32, userId int32) ([]repository.Post, error)
+	AddComment(comment repository.Comment) error
+	GetAllComments(limit int32, offset int32, postId int32) ([]repository.Comment, error)
 }
 
 type PostService struct {
@@ -93,6 +95,36 @@ func (ps *PostService) GetAllPosts(pagination *pb.Pagination, userId int32) (*pb
 			UpdatedAt:   timestamppb.New(post.UpdatedAt),
 			IsPrivate:   post.IsPrivate,
 			Tags:        post.Tags,
+		})
+	}
+
+	return &allPorts, nil
+}
+
+func (ps *PostService) AddComment(comment *pb.Comment, userId int32) error {
+	repoComment := repository.Comment{
+		PostId:    comment.PostId,
+		Text:      comment.Text,
+		UserId:    userId,
+		CreatedAt: time.Now(),
+	}
+
+	return ps.repository.AddComment(repoComment)
+}
+
+func (ps *PostService) GetAllComments(pagination *pb.Pagination, postId int32) (*pb.AllComments, error) {
+	comments, err := ps.repository.GetAllComments(pagination.PageSize, pagination.PageIndex, postId)
+	if err != nil {
+		return nil, err
+	}
+
+	var allPorts pb.AllComments
+	allPorts.Comments = make([]*pb.Comment, 0)
+
+	for _, comment := range comments {
+		allPorts.Comments = append(allPorts.Comments, &pb.Comment{
+			PostId: comment.PostId,
+			Text:   comment.Text,
 		})
 	}
 
