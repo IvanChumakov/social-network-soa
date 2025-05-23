@@ -29,3 +29,21 @@ func NewGrpcConnection(cfg *config.Config) (pb.PostsServiceClient, error) {
 
 	return pb.NewPostsServiceClient(conn), nil
 }
+
+func NewStatsGrpcConnection(cfg *config.Config) (pb.StatisticsServiceClient, error) {
+	conn, err := grpc.NewClient("statistics-service"+cfg.StatsGrpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Error(fmt.Sprintf("error connecting to stats grpc server: %v", err))
+		return nil, err
+	}
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-sigChan
+		conn.Close()
+	}()
+
+	return pb.NewStatisticsServiceClient(conn), nil
+}
