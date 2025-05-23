@@ -2,11 +2,12 @@ package user_service
 
 import (
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
 	"os"
 	customError "social-network/user-service/internal/errors"
 	"social-network/user-service/internal/logger"
 	"social-network/user-service/internal/repository"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type UserServiceInterface interface {
@@ -31,7 +32,8 @@ func (us *UserService) Register(user *repository.User) (string, int, error) {
 	if err != nil {
 		return "", 0, fmt.Errorf("failed to register user: %w", err)
 	}
-
+	
+	user.Id = id
 	token, err := createJWTToken(user)
 	if err != nil {
 		return "", 0, fmt.Errorf("failed to create JWT token: %w", err)

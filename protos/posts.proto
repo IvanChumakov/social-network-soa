@@ -71,3 +71,57 @@ service PostsService {
   rpc ViewEvent(View) returns (google.protobuf.Empty);
   rpc GetAllCommentsPaginated(Pagination) returns (AllComments);
 }
+
+message LikesViewsComments {
+  int32 likes = 1;
+  int32 views = 2;
+  int32 comments = 3;
+}
+
+message ViewsDynamic {
+  int32 views = 1;
+  google.protobuf.Timestamp date = 2;
+}
+
+message ViewsDynamicArr {
+  repeated ViewsDynamic views = 1;
+}
+
+message LikesDynamic {
+  int32 likes = 1;
+  google.protobuf.Timestamp date = 2;
+}
+
+message LikesDynamicArr {
+  repeated LikesDynamic likes = 1;
+}
+
+message CommentsDynamic {
+  int32 comments = 1;
+  google.protobuf.Timestamp date = 2;
+}
+
+message CommentsDynamicArr {
+  repeated CommentsDynamic comments = 1;
+}
+
+message PostsTop {
+  repeated int32 post_id = 1;
+}
+
+message Type {
+  string type = 1;
+}
+
+message UsersTop {
+  repeated int32 user_id = 1;
+}
+
+service StatisticsService {
+  rpc GetLikesViewsComments(PostId) returns (LikesViewsComments);
+  rpc GetViewsDynamic(PostId) returns (ViewsDynamicArr);
+  rpc GetLikesDynamic(PostId) returns (LikesDynamicArr);
+  rpc GetCommentsDynamic(PostId) returns (CommentsDynamicArr);
+  rpc GetPostsTop(Type) returns (PostsTop);
+  rpc GetUsersTop(Type) returns (UsersTop);
+}

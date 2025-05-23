@@ -50,6 +50,13 @@ func NewServer(cfg *config.Config, app *app.App) *http.Server {
 		}
 	})
 
+	mux.Handle("/stats", http.HandlerFunc(app.GetLikesViewsComments))
+	mux.Handle("/views-dynamic", http.HandlerFunc(app.GetViewsDynamic))
+	mux.Handle("/likes-dynamic", http.HandlerFunc(app.GetLikesDynamic))
+	mux.Handle("/comments-dynamic", http.HandlerFunc(app.GetCommentsDynamic))
+	mux.Handle("/posts-top", http.HandlerFunc(app.GetPostsTop))
+	mux.Handle("/users-top", http.HandlerFunc(app.GetUsersTop))
+
 	mux.Handle("/swagger/", httpSwagger.Handler(httpSwagger.URL("swagger/swagger/doc.json")))
 
 	return &http.Server{

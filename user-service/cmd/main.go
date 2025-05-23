@@ -1,8 +1,6 @@
 package main
 
 import (
-	"github.com/joho/godotenv"
-	"go.uber.org/fx"
 	"social-network/user-service/internal/app"
 	"social-network/user-service/internal/config"
 	"social-network/user-service/internal/db"
@@ -10,7 +8,10 @@ import (
 	"social-network/user-service/internal/repository"
 	"social-network/user-service/internal/server"
 	eventservice "social-network/user-service/internal/service/event-service"
-	"social-network/user-service/internal/service/user-service"
+	user_service "social-network/user-service/internal/service/user-service"
+
+	"github.com/joho/godotenv"
+	"go.uber.org/fx"
 )
 
 func main() {

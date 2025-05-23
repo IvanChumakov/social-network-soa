@@ -23,6 +23,7 @@ func main() {
 		fx.Provide(
 			config.NewConfig,
 			client.NewGrpcConnection,
+			client.NewStatsGrpcConnection,
 			app.NewApp,
 			server.NewServer,
 		),

@@ -424,3 +424,295 @@ var PostsService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "posts.proto",
 }
+
+const (
+	StatisticsService_GetLikesViewsComments_FullMethodName = "/StatisticsService/GetLikesViewsComments"
+	StatisticsService_GetViewsDynamic_FullMethodName       = "/StatisticsService/GetViewsDynamic"
+	StatisticsService_GetLikesDynamic_FullMethodName       = "/StatisticsService/GetLikesDynamic"
+	StatisticsService_GetCommentsDynamic_FullMethodName    = "/StatisticsService/GetCommentsDynamic"
+	StatisticsService_GetPostsTop_FullMethodName           = "/StatisticsService/GetPostsTop"
+	StatisticsService_GetUsersTop_FullMethodName           = "/StatisticsService/GetUsersTop"
+)
+
+// StatisticsServiceClient is the client API for StatisticsService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type StatisticsServiceClient interface {
+	GetLikesViewsComments(ctx context.Context, in *PostId, opts ...grpc.CallOption) (*LikesViewsComments, error)
+	GetViewsDynamic(ctx context.Context, in *PostId, opts ...grpc.CallOption) (*ViewsDynamicArr, error)
+	GetLikesDynamic(ctx context.Context, in *PostId, opts ...grpc.CallOption) (*LikesDynamicArr, error)
+	GetCommentsDynamic(ctx context.Context, in *PostId, opts ...grpc.CallOption) (*CommentsDynamicArr, error)
+	GetPostsTop(ctx context.Context, in *Type, opts ...grpc.CallOption) (*PostsTop, error)
+	GetUsersTop(ctx context.Context, in *Type, opts ...grpc.CallOption) (*UsersTop, error)
+}
+
+type statisticsServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewStatisticsServiceClient(cc grpc.ClientConnInterface) StatisticsServiceClient {
+	return &statisticsServiceClient{cc}
+}
+
+func (c *statisticsServiceClient) GetLikesViewsComments(ctx context.Context, in *PostId, opts ...grpc.CallOption) (*LikesViewsComments, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LikesViewsComments)
+	err := c.cc.Invoke(ctx, StatisticsService_GetLikesViewsComments_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *statisticsServiceClient) GetViewsDynamic(ctx context.Context, in *PostId, opts ...grpc.CallOption) (*ViewsDynamicArr, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ViewsDynamicArr)
+	err := c.cc.Invoke(ctx, StatisticsService_GetViewsDynamic_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *statisticsServiceClient) GetLikesDynamic(ctx context.Context, in *PostId, opts ...grpc.CallOption) (*LikesDynamicArr, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LikesDynamicArr)
+	err := c.cc.Invoke(ctx, StatisticsService_GetLikesDynamic_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *statisticsServiceClient) GetCommentsDynamic(ctx context.Context, in *PostId, opts ...grpc.CallOption) (*CommentsDynamicArr, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CommentsDynamicArr)
+	err := c.cc.Invoke(ctx, StatisticsService_GetCommentsDynamic_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *statisticsServiceClient) GetPostsTop(ctx context.Context, in *Type, opts ...grpc.CallOption) (*PostsTop, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PostsTop)
+	err := c.cc.Invoke(ctx, StatisticsService_GetPostsTop_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *statisticsServiceClient) GetUsersTop(ctx context.Context, in *Type, opts ...grpc.CallOption) (*UsersTop, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UsersTop)
+	err := c.cc.Invoke(ctx, StatisticsService_GetUsersTop_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// StatisticsServiceServer is the server API for StatisticsService service.
+// All implementations must embed UnimplementedStatisticsServiceServer
+// for forward compatibility.
+type StatisticsServiceServer interface {
+	GetLikesViewsComments(context.Context, *PostId) (*LikesViewsComments, error)
+	GetViewsDynamic(context.Context, *PostId) (*ViewsDynamicArr, error)
+	GetLikesDynamic(context.Context, *PostId) (*LikesDynamicArr, error)
+	GetCommentsDynamic(context.Context, *PostId) (*CommentsDynamicArr, error)
+	GetPostsTop(context.Context, *Type) (*PostsTop, error)
+	GetUsersTop(context.Context, *Type) (*UsersTop, error)
+	mustEmbedUnimplementedStatisticsServiceServer()
+}
+
+// UnimplementedStatisticsServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedStatisticsServiceServer struct{}
+
+func (UnimplementedStatisticsServiceServer) GetLikesViewsComments(context.Context, *PostId) (*LikesViewsComments, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLikesViewsComments not implemented")
+}
+func (UnimplementedStatisticsServiceServer) GetViewsDynamic(context.Context, *PostId) (*ViewsDynamicArr, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetViewsDynamic not implemented")
+}
+func (UnimplementedStatisticsServiceServer) GetLikesDynamic(context.Context, *PostId) (*LikesDynamicArr, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLikesDynamic not implemented")
+}
+func (UnimplementedStatisticsServiceServer) GetCommentsDynamic(context.Context, *PostId) (*CommentsDynamicArr, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCommentsDynamic not implemented")
+}
+func (UnimplementedStatisticsServiceServer) GetPostsTop(context.Context, *Type) (*PostsTop, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPostsTop not implemented")
+}
+func (UnimplementedStatisticsServiceServer) GetUsersTop(context.Context, *Type) (*UsersTop, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUsersTop not implemented")
+}
+func (UnimplementedStatisticsServiceServer) mustEmbedUnimplementedStatisticsServiceServer() {}
+func (UnimplementedStatisticsServiceServer) testEmbeddedByValue()                           {}
+
+// UnsafeStatisticsServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to StatisticsServiceServer will
+// result in compilation errors.
+type UnsafeStatisticsServiceServer interface {
+	mustEmbedUnimplementedStatisticsServiceServer()
+}
+
+func RegisterStatisticsServiceServer(s grpc.ServiceRegistrar, srv StatisticsServiceServer) {
+	// If the following call pancis, it indicates UnimplementedStatisticsServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&StatisticsService_ServiceDesc, srv)
+}
+
+func _StatisticsService_GetLikesViewsComments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StatisticsServiceServer).GetLikesViewsComments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StatisticsService_GetLikesViewsComments_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StatisticsServiceServer).GetLikesViewsComments(ctx, req.(*PostId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StatisticsService_GetViewsDynamic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StatisticsServiceServer).GetViewsDynamic(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StatisticsService_GetViewsDynamic_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StatisticsServiceServer).GetViewsDynamic(ctx, req.(*PostId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StatisticsService_GetLikesDynamic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StatisticsServiceServer).GetLikesDynamic(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StatisticsService_GetLikesDynamic_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StatisticsServiceServer).GetLikesDynamic(ctx, req.(*PostId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StatisticsService_GetCommentsDynamic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StatisticsServiceServer).GetCommentsDynamic(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StatisticsService_GetCommentsDynamic_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StatisticsServiceServer).GetCommentsDynamic(ctx, req.(*PostId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StatisticsService_GetPostsTop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Type)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StatisticsServiceServer).GetPostsTop(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StatisticsService_GetPostsTop_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StatisticsServiceServer).GetPostsTop(ctx, req.(*Type))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StatisticsService_GetUsersTop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Type)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StatisticsServiceServer).GetUsersTop(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StatisticsService_GetUsersTop_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StatisticsServiceServer).GetUsersTop(ctx, req.(*Type))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// StatisticsService_ServiceDesc is the grpc.ServiceDesc for StatisticsService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var StatisticsService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "StatisticsService",
+	HandlerType: (*StatisticsServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetLikesViewsComments",
+			Handler:    _StatisticsService_GetLikesViewsComments_Handler,
+		},
+		{
+			MethodName: "GetViewsDynamic",
+			Handler:    _StatisticsService_GetViewsDynamic_Handler,
+		},
+		{
+			MethodName: "GetLikesDynamic",
+			Handler:    _StatisticsService_GetLikesDynamic_Handler,
+		},
+		{
+			MethodName: "GetCommentsDynamic",
+			Handler:    _StatisticsService_GetCommentsDynamic_Handler,
+		},
+		{
+			MethodName: "GetPostsTop",
+			Handler:    _StatisticsService_GetPostsTop_Handler,
+		},
+		{
+			MethodName: "GetUsersTop",
+			Handler:    _StatisticsService_GetUsersTop_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "posts.proto",
+}

@@ -18,12 +18,14 @@ import (
 )
 
 type App struct {
-	grpcClient pb.PostsServiceClient
+	grpcClient  pb.PostsServiceClient
+	statsClient pb.StatisticsServiceClient
 }
 
-func NewApp(client pb.PostsServiceClient) *App {
+func NewApp(client pb.PostsServiceClient, statsClient pb.StatisticsServiceClient) *App {
 	return &App{
-		grpcClient: client,
+		grpcClient:  client,
+		statsClient: statsClient,
 	}
 }
 
@@ -468,4 +470,179 @@ func (a *App) GetAllComments(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = json.NewEncoder(w).Encode(comments)
+}
+
+func (a *App) GetLikesViewsComments(w http.ResponseWriter, r *http.Request) {
+	logger.Info("GET /stats")
+	if r.Method != http.MethodGet {
+		logger.Error("GET /stats: method not allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := JWTTokenVerify(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = fmt.Fprintf(w, err.Error())
+		return
+	}
+
+	postId, _ := strconv.Atoi(r.URL.Query().Get("post_id"))
+	postIdProto := pb.PostId{
+		PostId: int32(postId),
+	}
+
+	stats, err := a.statsClient.GetLikesViewsComments(r.Context(), &postIdProto)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Get likes views comments failed: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(stats)
+}
+
+func (a *App) GetViewsDynamic(w http.ResponseWriter, r *http.Request) {
+	logger.Info("GET /views-dynamic")
+	if r.Method != http.MethodGet {
+		logger.Error("GET /views-dynamic: method not allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := JWTTokenVerify(r); err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = fmt.Fprintf(w, err.Error())
+		return
+	}
+
+	postId, _ := strconv.Atoi(r.URL.Query().Get("post_id"))
+	postIdProto := pb.PostId{
+		PostId: int32(postId),
+	}
+
+	dynamic, err := a.statsClient.GetViewsDynamic(r.Context(), &postIdProto)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Get views dynamic failed: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(dynamic)
+}
+
+func (a *App) GetLikesDynamic(w http.ResponseWriter, r *http.Request) {
+	logger.Info("GET /likes-dynamic")
+	if r.Method != http.MethodGet {
+		logger.Error("GET /likes-dynamic: method not allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := JWTTokenVerify(r); err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = fmt.Fprintf(w, err.Error())
+		return
+	}
+
+	postId, _ := strconv.Atoi(r.URL.Query().Get("post_id"))
+	postIdProto := pb.PostId{
+		PostId: int32(postId),
+	}
+
+	dynamic, err := a.statsClient.GetLikesDynamic(r.Context(), &postIdProto)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Get views dynamic failed: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(dynamic)
+}
+
+func (a *App) GetCommentsDynamic(w http.ResponseWriter, r *http.Request) {
+	logger.Info("GET /comments-dynamic")
+	if r.Method != http.MethodGet {
+		logger.Error("GET /comments-dynamic: method not allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := JWTTokenVerify(r); err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = fmt.Fprintf(w, err.Error())
+		return
+	}
+
+	postId, _ := strconv.Atoi(r.URL.Query().Get("post_id"))
+	postIdProto := pb.PostId{
+		PostId: int32(postId),
+	}
+
+	dynamic, err := a.statsClient.GetCommentsDynamic(r.Context(), &postIdProto)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Get comments dynamic failed: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(dynamic)
+}
+
+func (a *App) GetPostsTop(w http.ResponseWriter, r *http.Request) {
+	logger.Info("GET /posts-top")
+	if r.Method != http.MethodGet {
+		logger.Error("GET /top-post: method not allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := JWTTokenVerify(r); err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = fmt.Fprintf(w, err.Error())
+		return
+	}
+
+	typeEvent := r.URL.Query().Get("type")
+	typePb := pb.Type{
+		Type: typeEvent,
+	}
+
+	top, err := a.statsClient.GetPostsTop(r.Context(), &typePb)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Get top posts failed: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(top)
+}
+
+func (a *App) GetUsersTop(w http.ResponseWriter, r *http.Request) {
+	logger.Info("GET /users-top")
+	if r.Method != http.MethodGet {
+		logger.Error("GET /top-user: method not allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := JWTTokenVerify(r); err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = fmt.Fprintf(w, err.Error())
+		return
+	}
+
+	typeEvent := r.URL.Query().Get("type")
+	typePb := pb.Type{
+		Type: typeEvent,
+	}
+
+	top, err := a.statsClient.GetUsersTop(r.Context(), &typePb)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Get top users failed: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(top)
 }
